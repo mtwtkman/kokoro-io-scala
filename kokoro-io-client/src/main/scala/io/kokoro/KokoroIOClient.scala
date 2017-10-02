@@ -1,7 +1,7 @@
 package io.kokoro
 
 import io.kokoro.clients.Client
-import io.kokoro.clients.rooms.Rooms
+import io.kokoro.clients.channels.Channels
 import io.kokoro.utils.Configurations
 
 class KokoroIOClient(val accessToken: String) extends Clients {
@@ -9,7 +9,7 @@ class KokoroIOClient(val accessToken: String) extends Clients {
 }
 
 trait Clients
-  extends Rooms
+  extends Channels
 
 object KokoroIOClient {
   def apply(): KokoroIOClient = apply(Configurations.accessToken)

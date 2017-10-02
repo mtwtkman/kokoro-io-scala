@@ -1,10 +1,9 @@
 package io.kokoro.entities.enums
 
-object Authority extends Enumeration {
-  type Authority = Value
-
-  val Administrator = Value("administrator")
-  val Maintainer = Value("maintainer")
-  val Member = Value("member")
-  val Invited = Value("invited")
+object Authority {
+  sealed abstract class Authority
+  case object Administrator extends Authority
+  case object Maintainer extends Authority
+  case object Member extends Authority
+  case object Invited extends Authority
 }

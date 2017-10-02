@@ -4,7 +4,7 @@ import io.kokoro.entities.enums.Authority.Authority
 
 final case class Membership(
   id: String,
-  room: Room,
+  channel: Channel,
   authority: Authority,
   disable_notification: Boolean,
   unread_count: Int,

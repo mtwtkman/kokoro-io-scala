@@ -9,5 +9,5 @@ final case class Profile(
   display_name: String,
   avatar: String,
   archived: Boolean,
-  invited_rooms_count: Int
+  invited_channels_count: Int
 )
