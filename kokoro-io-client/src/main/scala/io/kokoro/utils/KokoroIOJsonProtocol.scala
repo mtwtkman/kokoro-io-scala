@@ -6,7 +6,21 @@ import spray.json._
 import io.kokoro.entities._
 import enums._
 
-trait JsonProtocol extends SprayJsonSupport with DefaultJsonProtocol {
+trait KokoroIOJsonProtocol extends SprayJsonSupport with DefaultJsonProtocol {
+  implicit object ChannelKindFormat extends RootJsonFormat[ChannelKind.ChannelKind] {
+    def read(json: JsValue): ChannelKind.ChannelKind = json match {
+      case JsString("public_channel") => ChannelKind.PublicChannel
+      case JsString("private_channel") => ChannelKind.PrivateChannel
+      case JsString("direct_message") => ChannelKind.DirectMessage
+      case x => deserializationError(s"Expected `public_channel`, `private_channel`, `direct_message`. But got $x")
+    }
+    def write(obj: ChannelKind.ChannelKind): JsValue = obj match {
+      case ChannelKind.PublicChannel => JsString("public_channel")
+      case ChannelKind.PrivateChannel => JsString("private_channel")
+      case ChannelKind.DirectMessage => JsString("direct_message")
+    }
+  }
+
   implicit object AuthorityFormat extends RootJsonFormat[Authority.Authority] {
     def read(json: JsValue): Authority.Authority = json match {
       case JsString("administrator") => Authority.Administrator
@@ -24,21 +38,6 @@ trait JsonProtocol extends SprayJsonSupport with DefaultJsonProtocol {
     }
   }
 
-  implicit object ChannelKindFormat extends RootJsonFormat[ChannelKind.ChannelKind] {
-    def read(json: JsValue): ChannelKind.ChannelKind = json match {
-      case JsString("public_channel") => ChannelKind.PublicChannel
-      case JsString("private_channel") => ChannelKind.PrivateChannel
-      case JsString("direct_message") => ChannelKind.DirectMessage
-      case x => deserializationError(s"Expected `public_channel`, `private_channel`, `direct_message`. But got $x")
-    }
-
-    def write(obj: ChannelKind.ChannelKind): JsValue = obj match {
-      case ChannelKind.PublicChannel => JsString("public_channel")
-      case ChannelKind.PrivateChannel => JsString("private_channel")
-      case ChannelKind.DirectMessage => JsString("direct_message")
-    }
-  }
-
   implicit object ProfileTypeFormat extends RootJsonFormat[ProfileType.ProfileType] {
     def read(json: JsValue): ProfileType.ProfileType = json match {
       case JsString("user") => ProfileType.User
@@ -52,7 +51,10 @@ trait JsonProtocol extends SprayJsonSupport with DefaultJsonProtocol {
     }
   }
 
-  implicit val channelProtocol = jsonFormat5(Channel)
+  implicit val channelProtocol: RootJsonFormat[Channel] = rootFormat(lazyFormat(jsonFormat6(Channel)))
+  implicit val channelWithoutMembership = jsonFormat5(ChannelWithoutMembership)
+  implicit val membershipProtocol: RootJsonFormat[Membership] = rootFormat(lazyFormat(jsonFormat6(Membership)))
   implicit val profileProtocol = jsonFormat7(Profile)
-  implicit val membershipProtocol = jsonFormat6(Membership)
 }
+
+object KokoroIOJsonSupport

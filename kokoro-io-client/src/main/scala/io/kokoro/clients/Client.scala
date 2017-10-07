@@ -14,9 +14,9 @@ import HttpMethods._
 import akka.http.scaladsl.model.headers.RawHeader
 import akka.stream.ActorMaterializer
 
-import io.kokoro.utils.JsonProtocol
+import io.kokoro.utils.KokoroIOJsonProtocol
 
-class Client(val accessToken: String) extends JsonProtocol {
+class Client(val accessToken: String) extends KokoroIOJsonProtocol {
   private def request[T](method: HttpMethod, uri: String): Future[T] = {
     implicit val system = ActorSystem(s"kokoro-io-api-${UUID.randomUUID}")
     implicit val materializer = ActorMaterializer()
@@ -25,9 +25,9 @@ class Client(val accessToken: String) extends JsonProtocol {
     val accessTokenHeader = RawHeader("X-Access-Token", accessToken)
     val request = HttpRequest(method = method, uri = uri).withHeaders(accessTokenHeader)
 
-    for {
-      response <- Http().singleRequest(request)
-    } yield JsonParser(response.entity.getDataByte).toJson.convertTo[T]
+    val response = Http().singleRequest(request)
+    val entity = response.entity
+    entity
   }
 
   def get[T](uri: String): Future[T] = request[T](GET, uri)
