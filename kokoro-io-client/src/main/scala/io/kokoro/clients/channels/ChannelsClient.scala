@@ -11,8 +11,7 @@ trait Channels {
   protected val client: Client
   private val uri = s"$kokoroioApiUrl/$kokoroioVersion/channels"
 
-  def channels(): Future[Seq[Channel]] = {
-    import client._
-    get[Seq[Channel]](uri)
+  def get(): Future[Seq[Channel]] = {
+    client.get[Seq[Channel]](uri)
   }
 }

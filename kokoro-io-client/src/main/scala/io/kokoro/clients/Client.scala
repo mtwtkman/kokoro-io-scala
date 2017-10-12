@@ -13,6 +13,7 @@ import akka.http.scaladsl.model._
 import HttpMethods._
 import akka.http.scaladsl.model.headers.RawHeader
 import akka.stream.ActorMaterializer
+import akka.http.scaladsl.unmarshalling.Unmarshal
 
 import io.kokoro.utils.KokoroIOJsonProtocol
 
@@ -24,10 +25,9 @@ class Client(val accessToken: String) extends KokoroIOJsonProtocol {
 
     val accessTokenHeader = RawHeader("X-Access-Token", accessToken)
     val request = HttpRequest(method = method, uri = uri).withHeaders(accessTokenHeader)
-
-    val response = Http().singleRequest(request)
-    val entity = response.entity
-    entity
+    Http().singleRequest(request) flatMap { response =>
+      Unmarshal(response.entity).to[T]
+    }
   }
 
   def get[T](uri: String): Future[T] = request[T](GET, uri)
